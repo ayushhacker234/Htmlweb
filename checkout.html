@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>AYUSH STORE CHECK</title>
+<style>
+body { font-family: Arial; margin:0; padding:20px; background:#f5f5f5; }
+h1 { text-align:center; margin-bottom:30px; }
+
+input, textarea, select, button {
+  width:100%; padding:10px; margin:5px 0 15px 0; border-radius:5px; border:1px solid #ccc; box-sizing:border-box;
+}
+
+button { background:#27ae60; color:#fff; border:none; cursor:pointer; font-size:16px; }
+
+#overlay {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.7); z-index:999; text-align:center;
+  color:#fff; font-size:24px; padding-top:200px;
+  flex-direction:column; justify-content:center; align-items:center;
+}
+
+#tick {
+  width:150px; height:150px; border-radius:50%; background:#27ae60;
+  margin:0 auto 20px; display:flex; justify-content:center; align-items:center;
+  font-size:100px; color:#fff; transform:scale(0);
+  animation: tickPop 0.5s forwards;
+}
+
+@keyframes tickPop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+#orderDetails {
+  background:#fff; color:#000; padding:20px; border-radius:10px; width:90%; max-width:400px; margin:0 auto;
+  text-align:left; font-size:16px;
+}
+</style>
+</head>
+<body>
+
+<h1>Product Deatls</h1>
+
+<form id="checkoutForm">
+  <label>NAME:</label>
+  <input type="text" id="name" required>
+
+  <label>ADDRESS:</label>
+  <textarea id="address" rows="3" required></textarea>
+
+  <input type="hidden" id="productInput">
+
+  <label>Quantity:</label>
+  <input type="number" id="quantity" value="1" min="1" required>
+
+  <label>Payment Method:</label>
+  <select id="payment" required>
+    <option value="">--Selecte--</option>
+    <option value="upi">UPI</option>
+    <option value="card">Card</option>
+    <option value="cod">Cash on Delivery</option>
+  </select>
+
+  <button type="submit">Conform Order</button>
+</form>
+
+<div id="overlay">
+  <div id="tick">✔</div>
+  <div id="orderDetails"></div>
+</div>
+
+<audio id="sound" src="success.mp3" preload="auto"></audio>
+
+<script>
+const form = document.getElementById("checkoutForm");
+const overlay = document.getElementById("overlay");
+const orderDetails = document.getElementById("orderDetails");
+const sound = document.getElementById("sound");
+
+// URL से product auto set
+const params = new URLSearchParams(window.location.search);
+const product = params.get("product");
+if(product){ document.getElementById("productInput").value = product; }
+
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const order = {
+    name: document.getElementById("name").value,
+    address: document.getElementById("address").value,
+    product: document.getElementById("productInput").value || "Unknown",
+    quantity: document.getElementById("quantity").value,
+    payment: document.getElementById("payment").value,
+    timestamp: new Date().toLocaleString()
+  };
+
+  overlay.style.display = "flex";
+  sound.play();
+
+  orderDetails.innerHTML = `
+    <h2>product deatls</h2>
+    <p><strong>NAME:</strong> ${order.name}</p>
+    <p><strong>ADDRESS:</strong> ${order.address}</p>
+    <p><strong>PRODUCT:</strong> ${order.product}</p>
+    <p><strong>QUANTITY:</strong> ${order.quantity}</p>
+    <p><strong>PAYMENT TYPE:</strong> ${order.payment}</p>
+    <p><em>TIME:</em> ${order.timestamp}</p>
+  `;
+
+  form.reset();
+});
+</script>
+
+</body>
+</html>
